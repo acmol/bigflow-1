@@ -1,0 +1,436 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Flume中Plan可视化图的生成 &#8212; Bigflow Python 1.0.0 documentation</title>
+    <link rel="stylesheet" href="../_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+   <!--<script src="static/lang_switch.js"></script>-->
+   <script>
+      function changelang(lang)
+      {
+           var url = document.location.toString();
+           var arrUrl = url.split("/");
+           var newUrl = "http://bigflow.cloud/" + lang + "/" + arrUrl.slice(4).join("/");
+           window.location.href=newUrl;
+       }
+   </script>
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li>
+	    <select name="lang" onChange="changelang(this.value)">
+                <option value ="zh">Chinese</option>
+                <option value ="en">English</option>
+            </select>
+        </li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Bigflow Python 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Flume中Plan可视化图的生成</a><ul>
+<li><a class="reference internal" href="#id2">第一部分 总览</a></li>
+<li><a class="reference internal" href="#id3">第二部分 准备工作</a><ul>
+<li><a class="reference internal" href="#samba">2.1 开发机samba服务配置</a></li>
+<li><a class="reference internal" href="#linuxgraphviz">2.2 linux机器配置与graphviz安装</a><ul>
+<li><a class="reference internal" href="#id4">2.2.1 说明</a></li>
+<li><a class="reference internal" href="#graphviz">2.2.2 graphviz安装</a></li>
+<li><a class="reference internal" href="#linuxsamba">2.2.3 linux连接samba服务</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#windowsgraphviz">2.3 windows机器配置与graphviz的安装</a><ul>
+<li><a class="reference internal" href="#id5">2.3.1 graphviz安装</a></li>
+<li><a class="reference internal" href="#windowssamba">2.3.2 windows连接samba服务</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id6">第三部分 Plan可视化图生成</a><ul>
+<li><a class="reference internal" href="#dot">3.1 .dot文件生成</a></li>
+<li><a class="reference internal" href="#id7">3.2 linux下graphviz的使用</a></li>
+<li><a class="reference internal" href="#id8">3.3 windows下graphviz的使用</a><ul>
+<li><a class="reference internal" href="#windows">3.3.1 windows下界面操作</a></li>
+<li><a class="reference internal" href="#id9">3.3.2 windows下命令行操作</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id10">3.4 生成的Plan可视化图样例</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/flume/plan_picture.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="flumeplan">
+<h1>Flume中Plan可视化图的生成<a class="headerlink" href="#flumeplan" title="Permalink to this headline">¶</a></h1>
+<p>Flume 中 <a class="reference external" href="http://project.baidu.com:8999/flume/doc/planner.html">Plan</a>
+可视化图可以很清晰地展示Plan计划流程,
+主要用于辅助对Plan的理解, 降低使用Pass对Plan进行优化时的调试难度。</p>
+<p>本教程的主要内容是如何生成Flume中Plan的可视化图, 教程包含了主要的准备工作以及生成图的主要步骤,
+并且给出了重要的说明以及关键的代码。</p>
+<p>Pass以及Plan相关的概念, 请参考 <a class="reference external" href="http://project.baidu.com:8999/flume/doc/planner.html">Plan</a> 。</p>
+<div class="section" id="id2">
+<h2>第一部分 总览<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>Flume源代码中, 在对Plan进行测试的时候会生成与Plan相关的.dot文件,
+这些.dot文件是对每一个阶段的Plan图的描述, Plan可视化的过程就是将这些.dot文件通过转化,
+最终生成可视化的拓扑结构图, 从而直观地展示Plan经过优化器前后的拓扑图变化。</p>
+<p>.dot文件需要通过调用Pass对Plan进行优化生成, 转化成可视化图的过程需要调用Graphviz工具的支持,
+Graphviz可以将.dot文件的内容处理成为图片的格式, 从而达到可视化的目的。
+教程将会在第二部分描述需要的准备工作, 第三部分描述如何将*.dot文件转化成为图片的格式,
+第四部分对可视化图进行简单的说明。</p>
+</div>
+<div class="section" id="id3">
+<h2>第二部分 准备工作<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<p>本章节内容主要是针对百度的内部环境, 给出的准备工作说明具有一定的特殊性。</p>
+<p><strong>百度开发需要使用测试机器, 而测试机器并不具有图形界面,
+所以无法直接在开发机器上浏览生成的可视化图片,
+因此需要另外具有linux桌面的机器或者是linux虚拟机, 当然也可以使用windows机器。</strong></p>
+<p>在准备工作中, 将会分别介绍linux机器的以及windows机器的配置与工具安装。
+由于.dot文件都是在开发机器上, 所以每次生成.dot对应图片的时候,
+都需要远程从开发机上拷贝.dot文件, 为了方便拷贝, 可以使用开发机自带的samba服务。</p>
+<div class="section" id="samba">
+<h3>2.1 开发机samba服务配置<a class="headerlink" href="#samba" title="Permalink to this headline">¶</a></h3>
+<p><strong>samba密码修改</strong></p>
+<ul>
+<li><ol class="first arabic simple">
+<li>登陆开发机申请界面  <a class="reference external" href="http://ocean.baidu.com/">http://ocean.baidu.com/</a></li>
+</ol>
+</li>
+<li><ol class="first arabic simple" start="2">
+<li>找到开发机, 选择操作-&gt;更多操作-&gt;修改samba密码, 完成修改samba密码</li>
+</ol>
+<blockquote>
+<div><a class="reference internal image-reference" href="../_images/plan_ocean_samba.png"><img alt="../_images/plan_ocean_samba.png" src="../_images/plan_ocean_samba.png" style="width: 800px;" /></a>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="linuxgraphviz">
+<h3>2.2 linux机器配置与graphviz安装<a class="headerlink" href="#linuxgraphviz" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h4>2.2.1 说明<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h4>
+<p>常用的linux系统包括ubuntu、fedora、centos以及redhat等版本,
+这里不具体介绍linux系统的安装流程, 需要的同学可以自行百度之。
+安装linux系统可以选择在公司发放的机器上安装双系统,
+也可以选择安装linux虚拟机, 教程中使用的是linux虚拟机, 系统为fedora 20桌面版。</p>
+<p>若是要安装虚拟机, 可以使用常用虚拟机软件VMware, 下载地址有很多,
+百度可以直接搜索到最新的版本以及相应的注册码, 当然如果觉得有必要的话,
+也可以选择购买VMware软件。安装好虚拟机之后, 可以下载相应linux系统的镜像文件,
+然后按照网上常用教程安装即可, 整个过程没有特别复杂的地方。</p>
+<p>若是采用双系统的方式, 安装方法请自行百度之。</p>
+</div>
+<div class="section" id="graphviz">
+<h4>2.2.2 graphviz安装<a class="headerlink" href="#graphviz" title="Permalink to this headline">¶</a></h4>
+<p>安装graphviz的方法主要分为两类, 一类是采用源码编译,
+另一类就是使用linux自带的apt-get或者yum等命令进行安装。
+（不在开发机上安装graphviz的原因, 除了开发机无法浏览突破外,
+还有一个比较重要的原因是由于开发机上没有sudo权限, 在编译或者安装过程中若出现错误,
+比较难以处理）</p>
+<p>出于便利性的考虑, 个人比较建议使用linux自带安装命令来完成安装,
+有兴趣的同学可以使用源码编译。</p>
+<p>Ubuntu</p>
+<blockquote>
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>sudo apt-get install graphviz
+</pre></div>
+</div>
+</div></blockquote>
+<p>Fedora</p>
+<blockquote>
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>sudo yum install graphviz
+</pre></div>
+</div>
+</div></blockquote>
+<p>dot命令是最主要的命令, 安装完成之后, 测试dot命令是否已经安装成功。</p>
+<blockquote>
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>dot -h
+</pre></div>
+</div>
+</div></blockquote>
+<p>若是返回以下结果, 说明graphviz已经安装成功。</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="../_images/plan_dot_cmd.png"><img alt="../_images/plan_dot_cmd.png" src="../_images/plan_dot_cmd.png" style="width: 400px;" /></a>
+</div></blockquote>
+</div>
+<div class="section" id="linuxsamba">
+<h4>2.2.3 linux连接samba服务<a class="headerlink" href="#linuxsamba" title="Permalink to this headline">¶</a></h4>
+<p>不同的linux机器, 连接samba的方式都不太一样, 教程仍以fedora系统进行说明, 官网的说明如下：</p>
+<p><a class="reference external" href="http://docs.fedoraproject.org/en-US/Fedora/12/html/Deployment_Guide/s1-samba-connect-share.html">http://docs.fedoraproject.org/en-US/Fedora/12/html/Deployment_Guide/s1-samba-connect-share.html</a></p>
+<ul class="simple">
+<li><ol class="first arabic">
+<li>打开fedora系统的文件窗口</li>
+</ol>
+</li>
+<li><ol class="first arabic" start="2">
+<li>点击File-&gt;EnterLocation…</li>
+</ol>
+</li>
+<li><ol class="first arabic" start="3">
+<li>输入smb://&lt;servername&gt;/&lt;sharename&gt;, 其中servername是开发机地址,</li>
+</ol>
+</li>
+</ul>
+<p>sharename是你登陆开发机的用户名, 回车之后会让输入密码,
+密码就是你自己之前设置的samba密码</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="../_images/plan_linux_samba.png"><img alt="../_images/plan_linux_samba.png" src="../_images/plan_linux_samba.png" style="width: 800px;" /></a>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="windowsgraphviz">
+<h3>2.3 windows机器配置与graphviz的安装<a class="headerlink" href="#windowsgraphviz" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id5">
+<h4>2.3.1 graphviz安装<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h4>
+<ul>
+<li><ol class="first arabic simple">
+<li>下载graphviz的windows安装版本:</li>
+</ol>
+<blockquote>
+<div><p><a class="reference external" href="http://www.graphviz.org/Download_windows.php">http://www.graphviz.org/Download_windows.php</a></p>
+</div></blockquote>
+</li>
+<li><ol class="first arabic simple" start="2">
+<li>下载完成后双击安装, 跟着流程完成安装</li>
+</ol>
+</li>
+</ul>
+</div>
+<div class="section" id="windowssamba">
+<h4>2.3.2 windows连接samba服务<a class="headerlink" href="#windowssamba" title="Permalink to this headline">¶</a></h4>
+<p>关于windows连接samba服务的流程, 可以参考以下教程：</p>
+<blockquote>
+<div><a class="reference external" href="http://linux.chinaunix.net/techdoc/beginner/2009/07/09/1122864.shtml">http://linux.chinaunix.net/techdoc/beginner/2009/07/09/1122864.shtml</a></div></blockquote>
+</div>
+</div>
+</div>
+<div class="section" id="id6">
+<h2>第三部分 Plan可视化图生成<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<p>.dot文件的生成需要在开发机上手动运行单测, 生成.dot文件之后,
+再将所有文件拷贝到虚拟机或者windows机器上, 之后进行图片的生成。</p>
+<div class="section" id="dot">
+<h3>3.1 .dot文件生成<a class="headerlink" href="#dot" title="Permalink to this headline">¶</a></h3>
+<p>关于如何git clone代码, 请参考：</p>
+<blockquote>
+<div><a class="reference external" href="http://project.baidu.com:8999/flume/doc/dev-tutorial.html#clone">http://project.baidu.com:8999/flume/doc/dev-tutorial.html#clone</a></div></blockquote>
+<p>以下内容操作在开发机上执行, 并且默认读者了解blade测试框架, 了解clone下来的代码。</p>
+<ul>
+<li><ol class="first arabic simple">
+<li>命令行进入…./baidu/flume/planner/dce/</li>
+</ol>
+</li>
+<li><ol class="first arabic simple" start="2">
+<li>执行以下命令</li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>blade build ...
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><ol class="first arabic simple" start="3">
+<li>命令行进入…./build64_release/flume/planner/dce/</li>
+</ol>
+</li>
+<li><ol class="first arabic simple" start="4">
+<li>执行以下命令</li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>./dce_planner_test
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><ol class="first arabic simple" start="5">
+<li>在当前文件夹下使用ls命令可以查看到生成的以大写字母开头的文件夹, 确认生成的文件</li>
+</ol>
+</li>
+</ul>
+<p>每个大写文件夹代表了一个Pass的完整流程, 文件夹下所有的.dot文件代表了每一次优化操作之后Plan图的结构。</p>
+</div>
+<div class="section" id="id7">
+<h3>3.2 linux下graphviz的使用<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>我们将在自己的linux机器上使用graphviz处理.dot文件, 需要将开发机上的.dot文件拷贝至本地,
+从而可以使用graphviz的相关命令。</p>
+<p>linux下, 我们使用graphviz中的dot命令将.dot文件处理成svg格式图片,
+.dot的具体用法可以在命令行下查询, 基本的用法如下：</p>
+<blockquote>
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>dot input.dot -Tsvg -o output.svg
+dot input.dot -Tpng -o output.png
+dot input.dot -Tbmp -o output.bmp
+</pre></div>
+</div>
+</div></blockquote>
+<p>其中input.dot代表了输入的.dot文件的路径, output.*代表了输出文件的路径,
+-T*代表了文件的类型, dot支持的文件类型比较多, 这里只是罗列出了svg, png, bmp三种文件类型。</p>
+<p>另外, 也可以编写批处理文件来同时处理多个.dot文件, 样例文件可以在以下路径中找到：</p>
+<p>…./baidu/flume/runtime/dce/static/draw.sh</p>
+<p>以下是修改过的一个版本：</p>
+<blockquote>
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span><span class="ch">#!/bin/bash</span>
+<span class="nv">OUT</span><span class="o">=</span>~/output
+mkdir -p <span class="nv">$OUT</span>
+rm <span class="nv">$OUT</span>/*
+<span class="k">for</span> file in *.dot<span class="p">;</span> <span class="k">do</span>
+    dot -Tsvg -o <span class="nv">$OUT</span>/<span class="si">${</span><span class="nv">file</span><span class="p">%.dot</span><span class="si">}</span>.svg <span class="nv">$file</span> <span class="m">2</span>&gt; /dev/null
+<span class="k">done</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="id8">
+<h3>3.3 windows下graphviz的使用<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<p>在windows下使用graphviz的前提也是将开发机上的.dot拷贝至本地。windows下的使用方式有两种,
+第一种为界面的方式, 另外一种为命令行的方式。</p>
+<p>这两种方式所需要的执行文件都在graphviz的安装路径下,
+教程的安装路径为d:\Program Files (x86)\Graphviz2.38,
+其中dot.exe与gvedit.exe均在安装路径的bin文件夹下。</p>
+<div class="section" id="windows">
+<h4>3.3.1 windows下界面操作<a class="headerlink" href="#windows" title="Permalink to this headline">¶</a></h4>
+<ul>
+<li><ol class="first arabic simple">
+<li>打开d:\Program Files (x86)\Graphviz2.38\bin\gvedit.exe</li>
+</ol>
+</li>
+<li><ol class="first arabic simple" start="2">
+<li>点击open图标, 打开相应的.dot文件, 同时生成图片</li>
+</ol>
+<blockquote>
+<div><a class="reference internal image-reference" href="../_images/plan_gvedit.png"><img alt="../_images/plan_gvedit.png" src="../_images/plan_gvedit.png" style="width: 800px;" /></a>
+</div></blockquote>
+</li>
+</ul>
+</div>
+<div class="section" id="id9">
+<h4>3.3.2 windows下命令行操作<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h4>
+<p>windows下命令行的方式与linux下格式一样, 基本的格式可以参考以下命令：</p>
+<blockquote>
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>dot.exe d:<span class="se">\i</span>nput.dot -Tpng -o d:<span class="se">\o</span>utput.png
+</pre></div>
+</div>
+</div></blockquote>
+<p>dot.exe在d:Program Files (x86)Graphviz2.38bin路径下, 也可以考虑将该路径加入到环境变量中。
+同样, 为了方便处理批量的.dot文件, 可以将以上命令写成批处理的形式。
+以下是批处理的一个简单样例, 请根据实际情况修改：</p>
+<blockquote>
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>del d:<span class="se">\Z</span>-output<span class="se">\*</span> /Q
+<span class="k">for</span> %%i in <span class="o">(</span>*.dot<span class="o">)</span> <span class="k">do</span>
+    d:<span class="se">\&quot;</span>Program Files <span class="o">(</span>x86<span class="o">)</span><span class="s2">&quot;\Graphviz2.38\bin\dot.exe %%i -Tpng -o d:\Z-output\%%i.png</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="id10">
+<h3>3.4 生成的Plan可视化图样例<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><a class="reference internal image-reference" href="../_images/plan_pic_example_1.png"><img alt="../_images/plan_pic_example_1.png" src="../_images/plan_pic_example_1.png" style="width: 1000px;" /></a>
+<a class="reference internal image-reference" href="../_images/plan_pic_example_2.png"><img alt="../_images/plan_pic_example_2.png" src="../_images/plan_pic_example_2.png" style="width: 1000px;" /></a>
+<a class="reference internal image-reference" href="../_images/plan_pic_example_3.png"><img alt="../_images/plan_pic_example_3.png" src="../_images/plan_pic_example_3.png" style="width: 1000px;" /></a>
+</div></blockquote>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li>
+	    <select name="lang" onChange="changelang(this.value)">
+                <option value ="zh">Chinese</option>
+                <option value ="en">English</option>
+            </select>
+        </li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Bigflow Python 1.0.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Baidu.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.
+    </div>
+   <script>
+       var url = document.location.toString();
+       var lang = url.split("/")[3];
+       var selects = document.getElementsByName("lang");
+    
+       var options_idx = 0;
+       var selects_idx = 0;
+       for (selects_idx = 0; selects_idx < selects.length; selects_idx++) {
+           var select = selects[selects_idx];
+           for (options_idx = 0; options_idx < select.options.length; options_idx++) {
+               if (select.options[options_idx].value == lang) {
+                   select.options[options_idx].selected = true;
+               }
+           }
+      }
+   </script>
+  </body>
+</html>
